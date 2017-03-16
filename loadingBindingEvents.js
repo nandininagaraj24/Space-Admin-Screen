@@ -1,49 +1,3 @@
-<!doctype html>
-<html>
-	<head>
-		<!--<script src="jspm_packages/system.js"></script>-->
-		<!--<script src="config.js"></script>
-		<script src="build.js"></script>-->
-
-		<script src="lib/data/Data.js"></script>
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
- 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-		<script src="https://use.fontawesome.com/3beeb1e4b2.js"></script>
-		<link rel="stylesheet" type="text/css" href="usrSpaceStyle.css">
-		<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-		<link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
-		<script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
-		
-		<!--<script>
-			System.import('src/index');
-		</script>-->
-		
-	</head>
-	<body>
-		<div>
-			<div class="headerDiv">
-				<h2 class="pgTitle">Space Admin</h2>
-				<div class="pageOptions">
-					<div class="addUserDiv">
-						<i class="fa fa-plus-circle addUserIcon" aria-hidden="true"></i><span id="addUser" class="newUser">New User</span>
-					</div>
-					<div class="addSpaceDiv">
-						<i class="fa fa-plus-circle addSpaceIcon" aria-hidden="true"></i><span id="addSpace" class="newSpace">Create Space</span>
-					</div>
-				</div>
-			</div>
-		<div class="userSpaceContainer style="width:100%;float:left;">
-			<div class="userSpaceContainerLeft">
-			</div>
-			<div class="userSpaceContainerRight" >
-			</div>
-		</div>
-		<script src="loadingBindingEvents.js"></script>
-	</body>
-</html>
-<script type="text/javascript">
-/*debugger
 var userInfoObj ={},spaceArray=[],spaceObj={},userNameToIdMap={}
 Data.User.getAll().then(function(userData){
     
@@ -97,30 +51,27 @@ $("div").on( "click", ".deleteSpace", function(e) {
 	var spaceDivId = parseInt($(this).closest(".userSpace").attr("data-spaceId"))
 	Data.Space.deleteById(spaceDivId).then(function (res){
 		debugger
-		Data.Space.getAll().then(function(spaceData){
-		    debugger
-		    $('.userSpaceContainerLeft').empty()
-		    $('.userSpaceContainerRight').empty()
-		    spaceArray=[],spaceObj={}
-		    for(var i=0;i<spaceData.length;i++){
-		    	spaceArray.push(spaceData[i])
-		    	spaceObj[spaceData[i].id] = spaceData[i];
-		    	//console.log(spaceData[i])
-		    	//populateData(spaceData[i].id)
-		    	(function(i){
-			
-				    populateData(i)
-				   
-				}).call(spaceData[i],spaceData[i].id)
-		    }
-	  
-		});
+			Data.Space.getAll().then(function(spaceData){
+			    debugger
+			    $('.userSpaceContainerLeft').empty()
+			    $('.userSpaceContainerRight').empty()
+			    spaceArray=[],spaceObj={}
+			    for(var i=0;i<spaceData.length;i++){
+			    	spaceArray.push(spaceData[i])
+			    	spaceObj[spaceData[i].id] = spaceData[i];
+			    	//console.log(spaceData[i])
+			    	//populateData(spaceData[i].id)
+			    	(function(i){
+				
+					    populateData(i)
+					   
+					}).call(spaceData[i],spaceData[i].id)
+			    }
+		  
+			})
+		})
+})
 
-	}).catch(function() {
-	
-})
-	
-})
 
 $("div").on( "click", ".editSpace", function() {
   debugger
@@ -253,5 +204,4 @@ $("div").on("click","#addNewMemberToSpace",function(e){
  	debugger
  	$(this).closest("div").find('select').remove()
  	$(this).closest("div").find('.deleteDrpDwnIcon').remove()
- })*/
-</script>
+ })
