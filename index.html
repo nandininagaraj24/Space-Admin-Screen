@@ -1,0 +1,232 @@
+<!doctype html>
+<html>
+	<head>
+		<!--<script src="jspm_packages/system.js"></script>-->
+		<!--<script src="config.js"></script>
+		<script src="build.js"></script>-->
+
+		<script src="lib/data/Data.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+ 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		<script src="https://use.fontawesome.com/3beeb1e4b2.js"></script>
+		<link rel="stylesheet" type="text/css" href="usrSpaceStyle.css">
+		<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+		<link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+		<script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+		<!--<script>
+			System.import('src/index');
+		</script>-->
+		
+	</head>
+	<body>
+		<div>
+			<div class="headerDiv">
+				<h2 class="pgTitle">Space Admin</h2>
+				<div class="addSpaceDiv">
+					<i class="fa fa-plus-circle addSpaceIcon" aria-hidden="true"></i><span id="addSpace" class="newSpace">Create Space</span>
+				</div>
+			</div>
+		<div class="userSpaceContainer style="width:100%;float:left;">
+			<div class="userSpaceContainerLeft">
+			</div>
+			<div class="userSpaceContainerRight" >
+			</div>
+		</div>
+	</body>
+</html>
+<script type="text/javascript">
+debugger
+var userInfoObj ={},spaceArray=[],spaceObj={}
+Data.User.getAll().then(function(userData){
+    
+    for(var i=0;i<userData.length;i++){
+    	userInfoObj[userData[i].id] =  userData[i]
+    	console.log(userData[i])
+    }
+   
+});
+Data.Space.getAll().then(function(spaceData){
+    
+    for(var i=0;i<spaceData.length;i++){
+    	spaceArray.push(spaceData[i])
+    	spaceObj[spaceData[i].id] = spaceData[i];
+    	//console.log(spaceData[i])
+    	//populateData(spaceData[i].id)
+    	(function(i){
+	//for(var i=0;i<spaceArray.length;i++){
+    	/*$.get("usrSpace.html", function(usrSpaceDiv){
+    		debugger
+    		$(usrSpaceDiv).find(".spaceTitle").html(spaceArray[i].title +" created by "+userInfoObj[spaceArray[i].created_by].first_name+" "+userInfoObj[spaceArray[i].created_by].last_name)
+    		$(usrSpaceDiv).find(".spaceDescr").html(spaceArray[i].description)
+    		$(".userSpaceContainer").append($(usrSpaceDiv))
+    		console.log(spaceArray[i])
+    	});*/
+		    /*	this.popu = function(){
+		    		
+		    	$.ajax({
+				    url: "usrSpace.html",
+				    success: function (usrSpace) { 
+				    	debugger
+				    	var usrSpaceDiv = $(usrSpace)
+				    	$(usrSpaceDiv).attr("data-spaceId",spaceObj[i].id);
+				    	$(usrSpaceDiv).find(".spaceTitle").html(spaceObj[i].title +" created by "+userInfoObj[spaceObj[i].created_by].first_name+" "+userInfoObj[spaceObj[i].created_by].last_name)
+			    		$(usrSpaceDiv).find(".spaceDescr").html(spaceObj[i].description)
+			    		if(i%2 ==0){
+			    			$(".userSpaceContainerRight").append($(usrSpaceDiv))
+			    		}
+			    		else{
+			    			$(".userSpaceContainerLeft").append($(usrSpaceDiv))
+			    		}
+				    },
+				    dataType: 'html'//,
+		        	//async: false
+				});
+		    }
+		    this.popu()*/
+		    populateData(i)
+		   // }
+		}).call(spaceObj[i],spaceData[i].id)
+    }
+	  
+});
+
+var populateData = function(id){
+	//for(var i=0;i<spaceArray.length;i++){
+    	/*$.get("usrSpace.html", function(usrSpaceDiv){
+    		debugger
+    		$(usrSpaceDiv).find(".spaceTitle").html(spaceArray[i].title +" created by "+userInfoObj[spaceArray[i].created_by].first_name+" "+userInfoObj[spaceArray[i].created_by].last_name)
+    		$(usrSpaceDiv).find(".spaceDescr").html(spaceArray[i].description)
+    		$(".userSpaceContainer").append($(usrSpaceDiv))
+    		console.log(spaceArray[i])
+    	});*/
+    	$.ajax({
+		    url: "usrSpace.html",
+		    success: function (usrSpace) { 
+		    	debugger
+		    	var usrSpaceDiv = $(usrSpace)
+		    	$(usrSpaceDiv).attr("data-spaceId",spaceObj[id].id);
+		    	$(usrSpaceDiv).find(".spaceTitle").html(spaceObj[id].title +" created by "+userInfoObj[spaceObj[id].created_by].first_name+" "+userInfoObj[spaceObj[id].created_by].last_name)
+	    		$(usrSpaceDiv).find(".spaceDescr").html(spaceObj[id].description)
+	    		if(id%2 ==0){
+	    			$(".userSpaceContainerRight").append($(usrSpaceDiv))
+	    		}
+	    		else{
+	    			$(".userSpaceContainerLeft").append($(usrSpaceDiv))
+	    		}
+		    },
+		    dataType: 'html',
+        	async: false
+		});
+   // }
+}
+
+$("div").on( "click", ".deleteSpace", function(e) {
+  debugger
+  e.stopPropagation();
+	var spaceDivId = parseInt($(this).closest(".userSpace").attr("data-spaceId"))
+	Data.Space.deleteById(spaceDivId).then(function (res){
+		debugger
+		Data.Space.getAll().then(function(spaceData){
+		    debugger
+		    $('.userSpaceContainerLeft').empty()
+		    $('.userSpaceContainerRight').empty()
+		    spaceArray=[],spaceObj={}
+		    for(var i=0;i<spaceData.length;i++){
+		    	spaceArray.push(spaceData[i])
+		    	spaceObj[spaceData[i].id] = spaceData[i];
+		    	//console.log(spaceData[i])
+		    	//populateData(spaceData[i].id)
+		    	(function(i){
+			
+				    populateData(i)
+				   
+				}).call(spaceData[i],spaceData[i].id)
+		    }
+	  
+		});
+
+	}).catch(function() {
+	/* error :( */
+})
+	
+})
+
+$("div").on( "click", ".editSpace", function() {
+  debugger
+	var spaceDivId = parseInt($(this).closest(".userSpace").attr("data-spaceId"))
+	//Data.Space.deleteById(spaceDivId);
+	//location.reload(); 
+	$.ajax({
+		    url: "spaceInfo.html",
+		    success: function (spaceInfoContent) { 
+		    	debugger
+		    	var $currentSpaceInfo = $(spaceInfoContent)
+		    	if(spaceObj[spaceDivId].welcome)  $($currentSpaceInfo).find("#welcome").prop('checked', true);
+		    	if(spaceObj[spaceDivId].private)  $($currentSpaceInfo).find("#private").prop('checked', true);
+		    	if(spaceObj[spaceDivId].featured) $($currentSpaceInfo).find("#featured").prop('checked', true);
+
+		    	$($currentSpaceInfo).find(".spcTitle").attr("placeholder",spaceObj[spaceDivId].title)
+		    	$($currentSpaceInfo).find("#spcDescr").attr("placeholder",spaceObj[spaceDivId].description)
+
+		    	var membersArray = spaceObj[spaceDivId].members
+
+		    	if(membersArray){
+		    		for(var i=0;i<membersArray.length;i++){
+				    	$($currentSpaceInfo).find("#spcMembers").append('<div><i class="fa fa-user-o userIcon" aria-hidden="true"></i><span>'+userInfoObj[membersArray[i]].first_name+" "+userInfoObj[membersArray[i]].last_name+'</span></div>')
+				    }
+		    	}
+		    	else{
+		    		$($currentSpaceInfo).find("#spcMembers").append('<div>None</div>')
+		    	}
+
+		    	$(".userSpaceContainer").html($currentSpaceInfo)
+		    },
+		    dataType: 'html',
+        	async: false
+		});
+})
+
+//$("div").on("click","#addSpace",function(e){
+$("#addSpace").on("click",function(e){
+	e.stopPropagation();
+	$.ajax({
+		    url: "CreateSpace.html",
+		    success: function (createSpaceContent) { 
+		    	debugger
+		    	$(".userSpaceContainer").html(createSpaceContent)
+		    },
+		    dataType: 'html',
+        	async: false
+		});
+
+})
+
+/*$("div").on( "click", "#saveNewSpace", function() {
+//$("#saveNewSpace").on("click",function(e){
+	debugger
+	var params = {
+		"title" : $('.spaceTitle').text().trim(),
+		"description" : $('.spcDescr').text().trim(),
+		"members": $('#spcMembers').text(),
+		"created_by":$('#createdBy').text().trim(),
+		"welcome":true,
+		"private":false,
+		"featured":false
+	}
+})
+*/
+var saveSpace = function(){
+	debugger
+	var params = {
+		"title" : $('.spaceTitle').text().trim(),
+		"description" : $('.spcDescr').text().trim(),
+		"members": $('#spcMembers').text(),
+		"created_by":$('#createdBy').text().trim(),
+		"welcome":true,
+		"private":false,
+		"featured":false
+	}
+
+}
+</script>

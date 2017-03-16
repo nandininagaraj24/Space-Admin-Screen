@@ -1,0 +1,77 @@
+.userSpace{
+	border: 1px solid #d4cfcf;
+    width: 400px;
+    margin:20px;
+    border-radius: 10px;
+    padding-bottom: 20px;
+    margin-bottom: 40px;
+    background-color: rgba(186, 200, 224, 0.66);//rgba(23, 66, 136, 0.66);
+    box-shadow: 10px 10px 5px #888888;
+}
+.headerSection{
+	padding: 10px;
+	padding-bottom: :20px;
+	color:white;//#3232a2;
+	background-color: rgba(23, 66, 136, 0.66);//rgba(20, 158, 121, 0.88);
+	border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+.deleteSpace{
+	float: right;
+    color: #a53d3d;
+    cursor:pointer;
+}
+.editSpace{
+	float: right;
+    padding-right: 20px;
+    color: #de984b;//#dcb56d;
+    cursor:pointer;
+}
+.spaceDescr{
+	padding: 10px;
+	padding-top: 30px !important;
+	color: #8a8282;//#d6d4d4;
+}
+.userSpaceContent{
+}
+#spcMembers{
+	height:initial !important;
+}
+.userIcon{
+	color:grey;
+	padding-right: 10px;
+}
+.userSpaceContainerRight{
+	float:left;
+}
+.userSpaceContainerLeft{
+	width: 35%;
+    float: left;
+    margin-right: 10%;
+}
+.userSpaceContainer{
+	width: 100%;
+    float: left;
+    padding: 5%;
+    padding-left: 10%;
+}
+.newSpace{
+	padding-left: 5px;
+	cursor: pointer;
+	float:right;
+}
+.pgTitle{
+	float:left;
+}
+.addSpaceDiv{
+	float:right;
+	padding: 40px;
+}
+.headerDiv{
+	width:100%;
+	//background-color: rgba(23, 66, 136, 0.66);
+	background-color: rgba(42, 95, 150, 0.81);
+    height: 80px;
+    color: white;
+
+}
