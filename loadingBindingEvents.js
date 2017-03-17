@@ -59,7 +59,7 @@ var populateData = function(id){
 		    success: function (usrSpace) { 
 		    	debugger
 		    	var usrSpaceDiv = $(usrSpace)
-		    	$(usrSpaceDiv).attr("data-spaceId",spaceObj[id].id);
+		    	$(usrSpaceDiv).find(".spaceTitle").attr("data-spaceid",spaceObj[id].id);
 		    	$(usrSpaceDiv).find(".spaceTitle").html(spaceObj[id].title +" created by "+userInfoObj[spaceObj[id].created_by].first_name+" "+userInfoObj[spaceObj[id].created_by].last_name)
 	    		$(usrSpaceDiv).find(".spaceDescr").html(spaceObj[id].description)
 	    		if(id%2 ==0){
@@ -79,7 +79,7 @@ var bindEvents = function(){
 $("div").on( "click", ".deleteSpace", function(e) {
   debugger
   e.stopPropagation();
-	var spaceDivId = parseInt($(this).closest(".userSpace").attr("data-spaceId"))
+	var spaceDivId = parseInt($(this).closest(".userSpace").find(".spaceTitle").attr("data-spaceId"))
 	Data.Space.deleteById(spaceDivId).then(function (res){
 		debugger
 			Data.Space.getAll().then(function(spaceData){
@@ -109,7 +109,7 @@ $("div").on( "click", ".deleteSpace", function(e) {
 
 $("div").on( "click", ".editSpace", function() {
   debugger
-	var spaceDivId = parseInt($(this).closest(".userSpace").attr("data-spaceId"))
+	var spaceDivId = parseInt($(this).closest(".userSpace").find(".spaceTitle").attr("data-spaceid"))
 	//Data.Space.deleteById(spaceDivId);
 	//location.reload(); 
 	$.ajax({
@@ -123,6 +123,7 @@ $("div").on( "click", ".editSpace", function() {
 
 		    	/*$($currentSpaceInfo).find(".spcTitle").attr("placeholder",spaceObj[spaceDivId].title)
 		    	$($currentSpaceInfo).find("#spcDescr").attr("placeholder",spaceObj[spaceDivId].description)*/
+		    	$($currentSpaceInfo).find(".spcTitle").attr("data-spaceId",spaceObj[spaceDivId].id)
 		    	$($currentSpaceInfo).find(".spcTitle").val(spaceObj[spaceDivId].title)
 		    	$($currentSpaceInfo).find("#spcDescr").val(spaceObj[spaceDivId].description)
 
@@ -244,6 +245,76 @@ var fecthUsrNameDrpDpwn = function(createdByUserSelector,newDiv){
 	  })
 	}
 })
+
+  $("div").on( "click", ".saveEditedSpace", function(e) {
+//$("#saveNewSpace").on("click",function(e){
+	e.stopPropagation();
+  debugger
+  var spaceId = parseInt($(".spcTitle").attr("data-spaceid"))
+
+  var memberId =[]
+  var $membersDrpDwn = $("#spcMembers").find("select")
+  for(var i=0;i< $membersDrpDwn.length;i++){
+  	var newMemberId = parseInt($($($membersDrpDwn)[i]).val())
+  	if(memberId.indexOf(newMemberId) == -1){
+	  	memberId.push()
+	 }
+  }
+  var spaceParams = {
+  	"id":spaceId,
+    "title" : $('#spaceTitle').val().trim(),
+    "description" : $('#spcDescr').val().trim(),
+    "members": (memberId.length > 0)?memberId:null,
+    "created_by":parseInt($('.createdByUser_drpDwn').val()),//userNameToIdMap[$('#createdByUser_drpDwn').val().trim()],
+    "welcome":$('#welcome').prop('checked'),
+    "private":$('#private').prop('checked'),
+    "featured":$('#featured').prop('checked')
+  }
+  if(!spaceParams.title || !spaceParams.description || !spaceParams.created_by){
+  	alert("Title, description and created by are mandatory fields");
+  }
+	else{
+	//  Data.Space.create(spaceParams).then(function(createdSpace){
+	  	debugger
+	  //	alert("New Space created");
+	  //	Data.Space.getAll().then(function(spaceData){
+	  	Data.Space.updateById(spaceId,spaceParams).then(function(editedSpaceData){
+		debugger
+	   // spaceArray=[],
+	    //spaceObj={}
+
+	    Data.Space.getAll().then(function(spaceData){
+	    	debugger
+	    $.ajax({
+			    url: "loadingScreen.html",
+			    success: function (loadingScreenContent) { 
+			    	
+			    	$("body").html(loadingScreenContent)
+
+			    	for(var i=0;i<spaceData.length;i++){
+					    	//spaceArray.push(spaceData[i])
+					    	spaceObj[spaceData[i].id] = spaceData[i];
+					    	(function(i){
+						
+							    populateData(i)
+							   
+							}).call(spaceData[i],spaceData[i].id)
+					    }
+					    bindEvents()
+			    },
+			    dataType: 'html'//,
+	        	//async: false
+			});
+	})
+	    
+		  
+	});
+	  	
+
+	  //})
+	}
+})
+
 $("div").on("click","#addNewMemberToSpace",function(e){
 	debugger
 	e.stopPropagation();
