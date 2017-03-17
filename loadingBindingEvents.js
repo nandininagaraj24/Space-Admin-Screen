@@ -112,6 +112,9 @@ $("div").on( "click", ".editSpace", function() {
 	var spaceDivId = parseInt($(this).closest(".userSpace").find(".spaceTitle").attr("data-spaceid"))
 	//Data.Space.deleteById(spaceDivId);
 	//location.reload(); 
+	Data.Space.getById(spaceDivId).then(function(spaceDetails){
+		debugger
+	var membersArray = spaceDetails.members
 	$.ajax({
 		    url: "spaceInfo.html",
 		    success: function (spaceInfoContent) { 
@@ -127,11 +130,11 @@ $("div").on( "click", ".editSpace", function() {
 		    	$($currentSpaceInfo).find(".spcTitle").val(spaceObj[spaceDivId].title)
 		    	$($currentSpaceInfo).find("#spcDescr").val(spaceObj[spaceDivId].description)
 
-		    	var membersArray = spaceObj[spaceDivId].members
+		    	//var membersArray = spaceObj[spaceDivId].members
 
 		    	if(membersArray){
 		    		for(var i=0;i<membersArray.length;i++){
-				    	$($currentSpaceInfo).find("#spcMembers").append('<div><i class="fa fa-user-o userIcon" aria-hidden="true"></i><span>'+userInfoObj[membersArray[i]].first_name+" "+userInfoObj[membersArray[i]].last_name+'</span></div>')
+				    	$($currentSpaceInfo).find("#spcMembers").append('<div class="existingMemberDiv"><div class="existingMember"><i class="fa fa-user-o userIcon" aria-hidden="true"></i><span>'+userInfoObj[membersArray[i]].first_name+" "+userInfoObj[membersArray[i]].last_name+'</span></div><span class="deleteUsr"><i class="fa fa-minus-circle deleteUsrIcon" title="Remove Member" aria-hidden="true"></i></span></div>')
 				    }
 		    	}
 		    	else{
@@ -143,6 +146,7 @@ $("div").on( "click", ".editSpace", function() {
 		    dataType: 'html'//,
         	//async: false
 		});
+	})
 })
 
 $("#addSpace").on("click",function(e){
@@ -194,7 +198,7 @@ var fecthUsrNameDrpDpwn = function(createdByUserSelector,newDiv){
   for(var i=0;i< $membersDrpDwn.length;i++){
   	var newMemberId = parseInt($($($membersDrpDwn)[i]).val())
   	if(memberId.indexOf(newMemberId) == -1){
-	  	memberId.push()
+	  	memberId.push(newMemberId)
 	 }
   }
   var spaceParams = {
@@ -251,13 +255,15 @@ var fecthUsrNameDrpDpwn = function(createdByUserSelector,newDiv){
 	e.stopPropagation();
   debugger
   var spaceId = parseInt($(".spcTitle").attr("data-spaceid"))
-
-  var memberId =[]
-  var $membersDrpDwn = $("#spcMembers").find("select")
+Data.Space.getById(spaceId).then(function(spaceDetails){
+		debugger
+	var memberId = (spaceDetails.members)?spaceDetails.members:[]
+  //var memberId =[]
+  var $membersDrpDwn = $(".newMembersDiv_drpDwn").find("select")
   for(var i=0;i< $membersDrpDwn.length;i++){
   	var newMemberId = parseInt($($($membersDrpDwn)[i]).val())
   	if(memberId.indexOf(newMemberId) == -1){
-	  	memberId.push()
+	  	memberId.push(newMemberId)
 	 }
   }
   var spaceParams = {
@@ -314,10 +320,14 @@ var fecthUsrNameDrpDpwn = function(createdByUserSelector,newDiv){
 	  //})
 	}
 })
+})
 
 $("div").on("click","#addNewMemberToSpace",function(e){
 	debugger
 	e.stopPropagation();
+	if($("#spcMembers").find("div").text().trim() == "None"){
+		$("#spcMembers").empty()
+	}
  	fecthUsrNameDrpDpwn('newMembersDiv',true)
 })
 
@@ -347,5 +357,35 @@ $("div").on("click","#addNewMemberToSpace",function(e){
  	debugger
  	$(this).closest("div").find('select').remove()
  	$(this).closest("div").find('.deleteDrpDwnIcon').remove()
+ })
+ $("div").on("click",".deleteUsr",function(){
+ 	debugger
+ 	var memberName = $(this).closest(".existingMemberDiv").find("span").text().trim()
+ 	var memberId = userNameToIdMap[memberName]
+ 	$(this).closest(".existingMemberDiv").remove()
+ 	var spaceId = parseInt($(".spcTitle").attr("data-spaceid"))
+ 	if(memberId){
+ 		Data.Space.getById(spaceId).then(function(spaceDetails){
+ 			debugger
+ 			var currentMembers = spaceDetails.members
+ 			var index = currentMembers.indexOf(memberId);
+ 			if(index >=0){
+	 			currentMembers.splice(index, 1);
+	 		}
+ 			var spaceParams = {
+							  	"id":spaceDetails.id,
+							    "title" : spaceDetails.title,
+							    "description" : spaceDetails.description,
+							    "members": (currentMembers.length > 0)?currentMembers:null,
+							    "created_by":spaceDetails.created_by,
+							    "welcome":spaceDetails.welcome,
+							    "private":spaceDetails.private,
+							    "featured":spaceDetails.featured
+							  }
+ 			Data.Space.updateById(spaceId,spaceParams).then(function(res){
+ 				alert("Member Removed")
+ 			})
+ 		})
+ 	}
  })
 }
