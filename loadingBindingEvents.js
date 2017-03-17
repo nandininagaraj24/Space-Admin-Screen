@@ -1,6 +1,6 @@
-var userInfoObj ={},spaceArray=[],spaceObj={},userNameToIdMap={}
+var userInfoObj ={},spaceObj={},userNameToIdMap={}//,spaceArray=[]
 Data.User.getAll().then(function(userData){
-    
+    debugger
     for(var i=0;i<userData.length;i++){
     	userInfoObj[userData[i].id] =  userData[i]
     	userNameToIdMap[userData[i].first_name+" "+userData[i].last_name] = userData[i].id
@@ -8,22 +8,52 @@ Data.User.getAll().then(function(userData){
     }
    
 });
+
 Data.Space.getAll().then(function(spaceData){
+	debugger
+    //spaceArray=[],
+    spaceObj={}
+    $.ajax({
+		    url: "loadingScreen.html",
+		    success: function (loadingScreenContent) { 
+		    	
+		    	$("body").html(loadingScreenContent)
+
+		    	for(var i=0;i<spaceData.length;i++){
+				    //	spaceArray.push(spaceData[i])
+				    	spaceObj[spaceData[i].id] = spaceData[i];
+				    	(function(i){
+					
+						    populateData(i)
+						   
+						}).call(spaceData[i],spaceData[i].id)
+				    }
+				    bindEvents()
+		    },
+		    dataType: 'html'//,
+        	//async: false
+		});
     
-    for(var i=0;i<spaceData.length;i++){
-    	spaceArray.push(spaceData[i])
-    	spaceObj[spaceData[i].id] = spaceData[i];
-    	(function(i){
-	
-		    populateData(i)
-		   
-		}).call(spaceObj[i],spaceData[i].id)
-    }
 	  
 });
 
+var loadSpaces = function(){
+	Data.Space.getAll().then(function(spaceData){
+		    	
+		    	for(var i=0;i<spaceData.length;i++){
+				    	//spaceArray.push(spaceData[i])
+				    	spaceObj[spaceData[i].id] = spaceData[i];
+				    	(function(i){
+					
+						    populateData(i)
+						   
+						}).call(spaceData[i],spaceData[i].id)
+				    }
+				})
+}
+
 var populateData = function(id){
-	
+	debugger
     	$.ajax({
 		    url: "usrSpace.html",
 		    success: function (usrSpace) { 
@@ -38,13 +68,14 @@ var populateData = function(id){
 	    		else{
 	    			$(".userSpaceContainerLeft").append($(usrSpaceDiv))
 	    		}
+	    		
 		    },
 		    dataType: 'html'//,
         	//async: false
 		});
   
 }
-
+var bindEvents = function(){
 $("div").on( "click", ".deleteSpace", function(e) {
   debugger
   e.stopPropagation();
@@ -55,9 +86,10 @@ $("div").on( "click", ".deleteSpace", function(e) {
 			    debugger
 			    $('.userSpaceContainerLeft').empty()
 			    $('.userSpaceContainerRight').empty()
-			    spaceArray=[],spaceObj={}
+			    //spaceArray=[],
+			    spaceObj={}
 			    for(var i=0;i<spaceData.length;i++){
-			    	spaceArray.push(spaceData[i])
+			    	//spaceArray.push(spaceData[i])
 			    	spaceObj[spaceData[i].id] = spaceData[i];
 			    	//console.log(spaceData[i])
 			    	//populateData(spaceData[i].id)
@@ -67,10 +99,12 @@ $("div").on( "click", ".deleteSpace", function(e) {
 					   
 					}).call(spaceData[i],spaceData[i].id)
 			    }
+
 		  
 			})
 		})
 })
+
 
 
 $("div").on( "click", ".editSpace", function() {
@@ -87,8 +121,10 @@ $("div").on( "click", ".editSpace", function() {
 		    	if(spaceObj[spaceDivId].private)  $($currentSpaceInfo).find("#private").prop('checked', true);
 		    	if(spaceObj[spaceDivId].featured) $($currentSpaceInfo).find("#featured").prop('checked', true);
 
-		    	$($currentSpaceInfo).find(".spcTitle").attr("placeholder",spaceObj[spaceDivId].title)
-		    	$($currentSpaceInfo).find("#spcDescr").attr("placeholder",spaceObj[spaceDivId].description)
+		    	/*$($currentSpaceInfo).find(".spcTitle").attr("placeholder",spaceObj[spaceDivId].title)
+		    	$($currentSpaceInfo).find("#spcDescr").attr("placeholder",spaceObj[spaceDivId].description)*/
+		    	$($currentSpaceInfo).find(".spcTitle").val(spaceObj[spaceDivId].title)
+		    	$($currentSpaceInfo).find("#spcDescr").val(spaceObj[spaceDivId].description)
 
 		    	var membersArray = spaceObj[spaceDivId].members
 
@@ -109,6 +145,7 @@ $("div").on( "click", ".editSpace", function() {
 })
 
 $("#addSpace").on("click",function(e){
+	debugger
 	e.stopPropagation();
 	$.ajax({
 		    url: "CreateSpace.html",
@@ -175,6 +212,35 @@ var fecthUsrNameDrpDpwn = function(createdByUserSelector,newDiv){
 	  Data.Space.create(spaceParams).then(function(createdSpace){
 	  	debugger
 	  	alert("New Space created");
+	  	Data.Space.getAll().then(function(spaceData){
+		debugger
+	   // spaceArray=[],
+	    spaceObj={}
+	    $.ajax({
+			    url: "loadingScreen.html",
+			    success: function (loadingScreenContent) { 
+			    	
+			    	$("body").html(loadingScreenContent)
+
+			    	for(var i=0;i<spaceData.length;i++){
+					    	//spaceArray.push(spaceData[i])
+					    	spaceObj[spaceData[i].id] = spaceData[i];
+					    	(function(i){
+						
+							    populateData(i)
+							   
+							}).call(spaceData[i],spaceData[i].id)
+					    }
+					    bindEvents()
+			    },
+			    dataType: 'html'//,
+	        	//async: false
+			});
+	    
+		  
+	});
+	  	
+
 	  })
 	}
 })
@@ -183,25 +249,32 @@ $("div").on("click","#addNewMemberToSpace",function(e){
 	e.stopPropagation();
  	fecthUsrNameDrpDpwn('newMembersDiv',true)
 })
+
  $("div").on("click","#addMemberToSpace",function(e){
  	debugger
  	e.stopPropagation();
  	fecthUsrNameDrpDpwn('spcMembers',true)
  })
 
- $("div").on("click",".backButton",function(){
+ $("div").on("click",".backButton",function(e){
+ 	debugger
+ 	e.stopPropagation();
  	$.ajax({
-		    url: "index.html",
+		    url: "loadingScreen.html",
 		    success: function (spaceScreen) { 
 		    	debugger
 		    	$("body").html(spaceScreen)
+		    	loadSpaces()
+		    	bindEvents()
 		    },
 		    dataType: 'html'//,
         	//async: false
 		});
+
  })
  $("div").on("click",".deleteDrpDwnIcon",function(){
  	debugger
  	$(this).closest("div").find('select').remove()
  	$(this).closest("div").find('.deleteDrpDwnIcon').remove()
  })
+}
