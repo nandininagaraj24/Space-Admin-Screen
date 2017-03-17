@@ -12,7 +12,7 @@ Data.User.getAll().then(function(userData){
 Data.Space.getAll().then(function(spaceData){
     spaceObj={}
     $.ajax({
-		    url: "loadingScreen.html",
+		    url: "html/loadingScreen.html",
 		    success: function (loadingScreenContent) { 
 		    	
 		    	$("body").html(loadingScreenContent)
@@ -48,7 +48,7 @@ var loadSpaces = function(){
 /*populating space information*/
 var populateData = function(id){
     	$.ajax({
-		    url: "usrSpace.html",
+		    url: "html/usrSpace.html",
 		    success: function (usrSpace) { 
 		    	debugger
 		    	var usrSpaceDiv = $(usrSpace)
@@ -100,7 +100,7 @@ $("div").on( "click", ".editSpace", function(e) {
 	Data.Space.getById(spaceDivId).then(function(spaceDetails){
 		var membersArray = spaceDetails.members
 		$.ajax({
-		    url: "spaceInfo.html",
+		    url: "html/spaceInfo.html",
 		    success: function (spaceInfoContent) { 
 		    	var $currentSpaceInfo = $(spaceInfoContent)
 		    	if(spaceObj[spaceDivId].welcome)  $($currentSpaceInfo).find("#welcome").prop('checked', true);
@@ -130,7 +130,7 @@ $("div").on( "click", ".editSpace", function(e) {
 $("#addSpace").on("click",function(e){
 	e.stopPropagation();
 	$.ajax({
-		    url: "createSpace.html",
+		    url: "html/createSpace.html",
 		    success: function (createSpaceContent) { 
 		    	var createSpaceContentDiv = $(createSpaceContent)
 		    	fecthUsrNameDrpDpwn("createdByUser",false)
@@ -185,11 +185,10 @@ $("div").on( "click", ".saveNewSpace", function(e) {
 	  }
 	  else{
 		  Data.Space.create(spaceParams).then(function(createdSpace){
-		  	alert("New Space created");
 		  	Data.Space.getAll().then(function(spaceData){
 			spaceObj={}
 		    $.ajax({
-					    url: "loadingScreen.html",
+					    url: "html/loadingScreen.html",
 					    success: function (loadingScreenContent) { 
 					    	
 					    	$("body").html(loadingScreenContent)
@@ -242,7 +241,7 @@ $("div").on( "click", ".saveEditedSpace", function(e) {
 		  	Data.Space.updateById(spaceId,spaceParams).then(function(editedSpaceData){
 				Data.Space.getAll().then(function(spaceData){
 		    		$.ajax({
-						    url: "loadingScreen.html",
+						    url: "html/loadingScreen.html",
 						    success: function (loadingScreenContent) { 
 						    	$("body").html(loadingScreenContent)
 								for(var i=0;i<spaceData.length;i++){
@@ -282,7 +281,7 @@ $("div").on("click","#addNewMemberToSpace",function(e){
  $("div").on("click",".backButton",function(e){
  	e.stopPropagation();
  	$.ajax({
-		    url: "loadingScreen.html",
+		    url: "html/loadingScreen.html",
 		    success: function (spaceScreen) { 
 		    	$("body").html(spaceScreen)
 		    	loadSpaces()
