@@ -20,6 +20,9 @@
     float:left;
     width: 250px;
 }
+.formActions{
+    padding-top: :10px;
+}
 .deleteUsr {
     padding-left: 10%;
     color: red;

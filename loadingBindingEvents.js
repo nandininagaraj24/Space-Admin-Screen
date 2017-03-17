@@ -1,17 +1,15 @@
-var userInfoObj ={},spaceObj={},userNameToIdMap={}//,spaceArray=[]
+var userInfoObj ={},spaceObj={},userNameToIdMap={}
+
+/*Fetch Existing Users information */
 Data.User.getAll().then(function(userData){
-    debugger
     for(var i=0;i<userData.length;i++){
     	userInfoObj[userData[i].id] =  userData[i]
     	userNameToIdMap[userData[i].first_name+" "+userData[i].last_name] = userData[i].id
-    	console.log(userData[i])
     }
-   
 });
 
+/*Loading Initial Screen with existing spaces */
 Data.Space.getAll().then(function(spaceData){
-	debugger
-    //spaceArray=[],
     spaceObj={}
     $.ajax({
 		    url: "loadingScreen.html",
@@ -20,7 +18,6 @@ Data.Space.getAll().then(function(spaceData){
 		    	$("body").html(loadingScreenContent)
 
 		    	for(var i=0;i<spaceData.length;i++){
-				    //	spaceArray.push(spaceData[i])
 				    	spaceObj[spaceData[i].id] = spaceData[i];
 				    	(function(i){
 					
@@ -30,30 +27,26 @@ Data.Space.getAll().then(function(spaceData){
 				    }
 				    bindEvents()
 		    },
-		    dataType: 'html'//,
-        	//async: false
+		    dataType: 'html'
 		});
-    
-	  
 });
 
+/*loading spaces*/
 var loadSpaces = function(){
 	Data.Space.getAll().then(function(spaceData){
 		    	
-		    	for(var i=0;i<spaceData.length;i++){
-				    	//spaceArray.push(spaceData[i])
-				    	spaceObj[spaceData[i].id] = spaceData[i];
-				    	(function(i){
-					
-						    populateData(i)
+		for(var i=0;i<spaceData.length;i++){
+			spaceObj[spaceData[i].id] = spaceData[i];
+				(function(i){
+					populateData(i)
 						   
-						}).call(spaceData[i],spaceData[i].id)
-				    }
-				})
+				}).call(spaceData[i],spaceData[i].id)
+		}
+	})
 }
 
+/*populating space information*/
 var populateData = function(id){
-	debugger
     	$.ajax({
 		    url: "usrSpace.html",
 		    success: function (usrSpace) { 
@@ -70,67 +63,52 @@ var populateData = function(id){
 	    		}
 	    		
 		    },
-		    dataType: 'html'//,
-        	//async: false
+		    dataType: 'html'
 		});
   
 }
+
+/*Action Events*/
 var bindEvents = function(){
+
+/*Delete Space*/
 $("div").on( "click", ".deleteSpace", function(e) {
-  debugger
   e.stopPropagation();
 	var spaceDivId = parseInt($(this).closest(".userSpace").find(".spaceTitle").attr("data-spaceId"))
 	Data.Space.deleteById(spaceDivId).then(function (res){
-		debugger
-			Data.Space.getAll().then(function(spaceData){
-			    debugger
-			    $('.userSpaceContainerLeft').empty()
-			    $('.userSpaceContainerRight').empty()
-			    //spaceArray=[],
-			    spaceObj={}
-			    for(var i=0;i<spaceData.length;i++){
-			    	//spaceArray.push(spaceData[i])
-			    	spaceObj[spaceData[i].id] = spaceData[i];
-			    	//console.log(spaceData[i])
-			    	//populateData(spaceData[i].id)
-			    	(function(i){
+		Data.Space.getAll().then(function(spaceData){
+			$('.userSpaceContainerLeft').empty()
+		    $('.userSpaceContainerRight').empty()
+			spaceObj={}
+			for(var i=0;i<spaceData.length;i++){
+			    spaceObj[spaceData[i].id] = spaceData[i];
+			    (function(i){
 				
-					    populateData(i)
+					populateData(i)
 					   
-					}).call(spaceData[i],spaceData[i].id)
-			    }
-
-		  
-			})
+				}).call(spaceData[i],spaceData[i].id)
+			}
 		})
+	})
 })
 
 
-
-$("div").on( "click", ".editSpace", function() {
-  debugger
+/* Edit Space Information*/
+$("div").on( "click", ".editSpace", function(e) {
+	e.stopPropagation();
 	var spaceDivId = parseInt($(this).closest(".userSpace").find(".spaceTitle").attr("data-spaceid"))
-	//Data.Space.deleteById(spaceDivId);
-	//location.reload(); 
 	Data.Space.getById(spaceDivId).then(function(spaceDetails){
-		debugger
-	var membersArray = spaceDetails.members
-	$.ajax({
+		var membersArray = spaceDetails.members
+		$.ajax({
 		    url: "spaceInfo.html",
 		    success: function (spaceInfoContent) { 
-		    	debugger
 		    	var $currentSpaceInfo = $(spaceInfoContent)
 		    	if(spaceObj[spaceDivId].welcome)  $($currentSpaceInfo).find("#welcome").prop('checked', true);
 		    	if(spaceObj[spaceDivId].private)  $($currentSpaceInfo).find("#private").prop('checked', true);
 		    	if(spaceObj[spaceDivId].featured) $($currentSpaceInfo).find("#featured").prop('checked', true);
-
-		    	/*$($currentSpaceInfo).find(".spcTitle").attr("placeholder",spaceObj[spaceDivId].title)
-		    	$($currentSpaceInfo).find("#spcDescr").attr("placeholder",spaceObj[spaceDivId].description)*/
 		    	$($currentSpaceInfo).find(".spcTitle").attr("data-spaceId",spaceObj[spaceDivId].id)
 		    	$($currentSpaceInfo).find(".spcTitle").val(spaceObj[spaceDivId].title)
 		    	$($currentSpaceInfo).find("#spcDescr").val(spaceObj[spaceDivId].description)
-
-		    	//var membersArray = spaceObj[spaceDivId].members
 
 		    	if(membersArray){
 		    		for(var i=0;i<membersArray.length;i++){
@@ -143,187 +121,149 @@ $("div").on( "click", ".editSpace", function() {
 
 		    	$(".userSpaceContainer").html($currentSpaceInfo)
 		    },
-		    dataType: 'html'//,
-        	//async: false
+		    dataType: 'html'
 		});
 	})
 })
 
+/*Create New Space*/
 $("#addSpace").on("click",function(e){
-	debugger
 	e.stopPropagation();
 	$.ajax({
-		    url: "CreateSpace.html",
+		    url: "createSpace.html",
 		    success: function (createSpaceContent) { 
-		    	debugger
 		    	var createSpaceContentDiv = $(createSpaceContent)
-		    	//var drpDown = fecthUsrNameDrpDpwn()
 		    	fecthUsrNameDrpDpwn("createdByUser",false)
-		    	//$(createSpaceContentDiv).find('.createdBy').append(drpDown)
 		    	$(".userSpaceContainer").html(createSpaceContentDiv)
 		    },
-		    dataType: 'html'//,
-        	//async: false
+		    dataType: 'html'
 		});
-
 })
+
+/*Existing User DropDown creation*/
 var fecthUsrNameDrpDpwn = function(createdByUserSelector,newDiv){
-	debugger
 	var usrNameDrpDown =""
 	if(newDiv)
 		usrNameDrpDown +="<div class='"+createdByUserSelector+"_drpDwn'><select>"
 	else
 		usrNameDrpDown +="<select class='"+createdByUserSelector+"_drpDwn'>"
-	//var usrNameDrpDown ="<select>"
 	Data.User.getAll().then(function(userData){
 		for(var i=0;i<userData.length;i++){
 			var usrName = userData[i].first_name + " "+ userData[i].last_name
 			usrNameDrpDown+='<option value="'+userData[i].id+'" >'+usrName +'</option>'
 		}
-	if(newDiv)
-		usrNameDrpDown +='</select><span class="deleteDrpDwn"><i class="fa fa-minus-circle deleteDrpDwnIcon" title="Remove Member" aria-hidden="true"></i></span></div>'
-	else
-		usrNameDrpDown +='</select><span class="deleteDrpDwn"><i class="fa fa-minus-circle deleteDrpDwnIcon" title="Remove Member" aria-hidden="true"></i></span>'
-	$('#'+createdByUserSelector).append(usrNameDrpDown)
-		//return usrNameDrpDown
+		if(newDiv)
+			usrNameDrpDown +='</select><span class="deleteDrpDwn"><i class="fa fa-minus-circle deleteDrpDwnIcon" title="Remove Member" aria-hidden="true"></i></span></div>'
+		else
+			usrNameDrpDown +='</select><span class="deleteDrpDwn"><i class="fa fa-minus-circle deleteDrpDwnIcon" title="Remove Member" aria-hidden="true"></i></span>'
+		$('#'+createdByUserSelector).append(usrNameDrpDown)
 	})
 }
 
- $("div").on( "click", ".saveNewSpace", function(e) {
-//$("#saveNewSpace").on("click",function(e){
-	e.stopPropagation();
-  debugger
-  var memberId =[]
-  var $membersDrpDwn = $("#spcMembers").find("select")
-  for(var i=0;i< $membersDrpDwn.length;i++){
-  	var newMemberId = parseInt($($($membersDrpDwn)[i]).val())
-  	if(memberId.indexOf(newMemberId) == -1){
-	  	memberId.push(newMemberId)
-	 }
-  }
-  var spaceParams = {
-    "title" : $('#spaceTitle').val().trim(),
-    "description" : $('#spcDescr').val().trim(),
-    "members": (memberId.length > 0)?memberId:null,
-    "created_by":parseInt($('.createdByUser_drpDwn').val()),//userNameToIdMap[$('#createdByUser_drpDwn').val().trim()],
-    "welcome":true,
-    "private":false,
-    "featured":false
-  }
-  if(!spaceParams.title || !spaceParams.description || !spaceParams.created_by){
-  	alert("Title, description and created by are mandatory fields");
-  }
-	else{
-	  Data.Space.create(spaceParams).then(function(createdSpace){
-	  	debugger
-	  	alert("New Space created");
-	  	Data.Space.getAll().then(function(spaceData){
-		debugger
-	   // spaceArray=[],
-	    spaceObj={}
-	    $.ajax({
-			    url: "loadingScreen.html",
-			    success: function (loadingScreenContent) { 
-			    	
-			    	$("body").html(loadingScreenContent)
+/*Save New Space*/
+$("div").on( "click", ".saveNewSpace", function(e) {
+	  e.stopPropagation();
+	  var memberId =[]
+	  var $membersDrpDwn = $("#spcMembers").find("select")
+	  for(var i=0;i< $membersDrpDwn.length;i++){
+	  	var newMemberId = parseInt($($($membersDrpDwn)[i]).val())
+	  	if(memberId.indexOf(newMemberId) == -1){
+		  	memberId.push(newMemberId)
+		 }
+	  }
+	  var spaceParams = {
+	    "title" : $('#spaceTitle').val().trim(),
+	    "description" : $('#spcDescr').val().trim(),
+	    "members": (memberId.length > 0)?memberId:null,
+	    "created_by":parseInt($('.createdByUser_drpDwn').val()),
+	    "welcome":true,
+	    "private":false,
+	    "featured":false
+	  }
+	  if(!spaceParams.title || !spaceParams.description || !spaceParams.created_by){
+	  	alert("Title, description and created by are mandatory fields");
+	  }
+	  else{
+		  Data.Space.create(spaceParams).then(function(createdSpace){
+		  	alert("New Space created");
+		  	Data.Space.getAll().then(function(spaceData){
+			spaceObj={}
+		    $.ajax({
+					    url: "loadingScreen.html",
+					    success: function (loadingScreenContent) { 
+					    	
+					    	$("body").html(loadingScreenContent)
 
-			    	for(var i=0;i<spaceData.length;i++){
-					    	//spaceArray.push(spaceData[i])
-					    	spaceObj[spaceData[i].id] = spaceData[i];
-					    	(function(i){
-						
-							    populateData(i)
-							   
-							}).call(spaceData[i],spaceData[i].id)
-					    }
-					    bindEvents()
-			    },
-			    dataType: 'html'//,
-	        	//async: false
-			});
-	    
-		  
-	});
-	  	
-
-	  })
+					    	for(var i=0;i<spaceData.length;i++){
+							    	spaceObj[spaceData[i].id] = spaceData[i];
+							    	(function(i){
+								
+									    populateData(i)
+									   
+									}).call(spaceData[i],spaceData[i].id)
+							    }
+							    bindEvents()
+					    },
+					    dataType: 'html'
+					});
+		  		});
+		  	})
 	}
 })
 
-  $("div").on( "click", ".saveEditedSpace", function(e) {
-//$("#saveNewSpace").on("click",function(e){
+/*Save Space Details After Edit*/
+$("div").on( "click", ".saveEditedSpace", function(e) {
 	e.stopPropagation();
-  debugger
-  var spaceId = parseInt($(".spcTitle").attr("data-spaceid"))
-Data.Space.getById(spaceId).then(function(spaceDetails){
-		debugger
-	var memberId = (spaceDetails.members)?spaceDetails.members:[]
-  //var memberId =[]
-  var $membersDrpDwn = $(".newMembersDiv_drpDwn").find("select")
-  for(var i=0;i< $membersDrpDwn.length;i++){
-  	var newMemberId = parseInt($($($membersDrpDwn)[i]).val())
-  	if(memberId.indexOf(newMemberId) == -1){
-	  	memberId.push(newMemberId)
-	 }
-  }
-  var spaceParams = {
-  	"id":spaceId,
-    "title" : $('#spaceTitle').val().trim(),
-    "description" : $('#spcDescr').val().trim(),
-    "members": (memberId.length > 0)?memberId:null,
-    "created_by":parseInt($('.createdByUser_drpDwn').val()),//userNameToIdMap[$('#createdByUser_drpDwn').val().trim()],
-    "welcome":$('#welcome').prop('checked'),
-    "private":$('#private').prop('checked'),
-    "featured":$('#featured').prop('checked')
-  }
-  if(!spaceParams.title || !spaceParams.description || !spaceParams.created_by){
-  	alert("Title, description and created by are mandatory fields");
-  }
-	else{
-	//  Data.Space.create(spaceParams).then(function(createdSpace){
-	  	debugger
-	  //	alert("New Space created");
-	  //	Data.Space.getAll().then(function(spaceData){
-	  	Data.Space.updateById(spaceId,spaceParams).then(function(editedSpaceData){
-		debugger
-	   // spaceArray=[],
-	    //spaceObj={}
-
-	    Data.Space.getAll().then(function(spaceData){
-	    	debugger
-	    $.ajax({
-			    url: "loadingScreen.html",
-			    success: function (loadingScreenContent) { 
-			    	
-			    	$("body").html(loadingScreenContent)
-
-			    	for(var i=0;i<spaceData.length;i++){
-					    	//spaceArray.push(spaceData[i])
-					    	spaceObj[spaceData[i].id] = spaceData[i];
-					    	(function(i){
-						
-							    populateData(i)
-							   
-							}).call(spaceData[i],spaceData[i].id)
-					    }
-					    bindEvents()
-			    },
-			    dataType: 'html'//,
-	        	//async: false
-			});
+  	var spaceId = parseInt($(".spcTitle").attr("data-spaceid"))
+	Data.Space.getById(spaceId).then(function(spaceDetails){
+		var memberId = (spaceDetails.members)?spaceDetails.members:[]
+		var $membersDrpDwn = $(".newMembersDiv_drpDwn").find("select")
+		for(var i=0;i< $membersDrpDwn.length;i++){
+		  	var newMemberId = parseInt($($($membersDrpDwn)[i]).val())
+		  	if(memberId.indexOf(newMemberId) == -1){
+			  	memberId.push(newMemberId)
+			}
+		}
+		var spaceParams = {
+		  	"id":spaceId,
+		    "title" : $('#spaceTitle').val().trim(),
+		    "description" : $('#spcDescr').val().trim(),
+		    "members": (memberId.length > 0)?memberId:null,
+		    "created_by":parseInt($('.createdByUser_drpDwn').val()),
+		    "welcome":$('#welcome').prop('checked'),
+		    "private":$('#private').prop('checked'),
+		    "featured":$('#featured').prop('checked')
+		}
+		if(!spaceParams.title || !spaceParams.description || !spaceParams.created_by){
+		  	alert("Title, description and created by are mandatory fields");
+		}
+		else{
+		  	
+		  	Data.Space.updateById(spaceId,spaceParams).then(function(editedSpaceData){
+				Data.Space.getAll().then(function(spaceData){
+		    		$.ajax({
+						    url: "loadingScreen.html",
+						    success: function (loadingScreenContent) { 
+						    	$("body").html(loadingScreenContent)
+								for(var i=0;i<spaceData.length;i++){
+								    	spaceObj[spaceData[i].id] = spaceData[i];
+								    	(function(i){
+											populateData(i)
+										   
+										}).call(spaceData[i],spaceData[i].id)
+								    }
+								    bindEvents()
+						    },
+						    dataType: 'html'
+						});
+					})
+		    	});
+			}
 	})
-	    
-		  
-	});
-	  	
-
-	  //})
-	}
-})
 })
 
+/*New Member addition to existing Space*/
 $("div").on("click","#addNewMemberToSpace",function(e){
-	debugger
 	e.stopPropagation();
 	if($("#spcMembers").find("div").text().trim() == "None"){
 		$("#spcMembers").empty()
@@ -331,42 +271,43 @@ $("div").on("click","#addNewMemberToSpace",function(e){
  	fecthUsrNameDrpDpwn('newMembersDiv',true)
 })
 
+/*Add New member to newly created space*/
  $("div").on("click","#addMemberToSpace",function(e){
- 	debugger
  	e.stopPropagation();
  	fecthUsrNameDrpDpwn('spcMembers',true)
  })
 
+
+/*Go to main page*/
  $("div").on("click",".backButton",function(e){
- 	debugger
  	e.stopPropagation();
  	$.ajax({
 		    url: "loadingScreen.html",
 		    success: function (spaceScreen) { 
-		    	debugger
 		    	$("body").html(spaceScreen)
 		    	loadSpaces()
 		    	bindEvents()
 		    },
-		    dataType: 'html'//,
-        	//async: false
+		    dataType: 'html'
 		});
 
  })
- $("div").on("click",".deleteDrpDwnIcon",function(){
- 	debugger
- 	$(this).closest("div").find('select').remove()
- 	$(this).closest("div").find('.deleteDrpDwnIcon').remove()
+
+/*Delete New Member div*/
+ $("div").on("click",".deleteDrpDwnIcon",function(e){
+ 	e.stopPropagation();
+ 	$(this).closest('.newMembersDiv_drpDwn').remove()
  })
- $("div").on("click",".deleteUsr",function(){
- 	debugger
+
+/*Delete existing member from space*/
+$("div").on("click",".deleteUsr",function(e){
+ 	e.stopPropagation();
  	var memberName = $(this).closest(".existingMemberDiv").find("span").text().trim()
  	var memberId = userNameToIdMap[memberName]
  	$(this).closest(".existingMemberDiv").remove()
  	var spaceId = parseInt($(".spcTitle").attr("data-spaceid"))
  	if(memberId){
  		Data.Space.getById(spaceId).then(function(spaceDetails){
- 			debugger
  			var currentMembers = spaceDetails.members
  			var index = currentMembers.indexOf(memberId);
  			if(index >=0){
