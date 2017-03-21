@@ -1,4 +1,4 @@
-var userInfoObj ={},spaceObj={},userNameToIdMap={}
+var userInfoObj ={},spaceObj={},userNameToIdMap={},spacesToDel=[]
 
 /*Fetch Existing Users information */
 Data.User.getAll().then(function(userData){
@@ -34,7 +34,7 @@ Data.Space.getAll().then(function(spaceData){
 /*loading spaces*/
 var loadSpaces = function(){
 	Data.Space.getAll().then(function(spaceData){
-		    	
+		 debugger   	
 		for(var i=0;i<spaceData.length;i++){
 			spaceObj[spaceData[i].id] = spaceData[i];
 				(function(i){
@@ -92,6 +92,43 @@ $("div").on( "click", ".deleteSpace", function(e) {
 	})
 })
 
+$("div").on("click",".delMultipleSpaces",function(e){
+	debugger
+	e.stopPropagation();
+	spacesToDel=[]
+	$(this).removeClass('delMultipleSpaces').addClass('delMultiSpacesText')
+	$('.headerSection').prepend('<input type="checkbox" class="multiDelCheckbox">')
+
+	$('.delMultiSpacesText').text("Click to delete")
+})
+
+$("div").on("click",".multiDelCheckbox",function(e){
+	debugger
+	e.stopPropagation();
+	var spaceId =  $(this).siblings(".spaceTitle").attr("data-spaceid")
+	if(!isNaN(spaceId)){
+		spacesToDel.push(parseInt(spaceId))
+	}
+
+})
+
+$("div").on("click",".delMultiSpacesText",function(e){
+	debugger
+	e.stopPropagation();
+	for(var i=0;i<spacesToDel.length;i++){
+		(function(i){
+		Data.Space.deleteById(spacesToDel[i]).then(function (res){
+			debugger
+			if(i == spacesToDel.length-1){
+				$('.userSpaceContainerLeft').empty()
+		    	$('.userSpaceContainerRight').empty()
+				loadSpaces()
+			}
+		})
+	}).call(spacesToDel[i],i)
+
+	}
+})
 
 /* Edit Space Information*/
 $("div").on( "click", ".editSpace", function(e) {
