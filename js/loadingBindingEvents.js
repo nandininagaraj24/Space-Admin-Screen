@@ -141,12 +141,10 @@ $("div").on("click",".statDiv",function(){
 	console.log(visits)
 	var diffSpaceTypes= ["welcome","private","featured"]
 	var seriesMembers = {
-							seriesName:"Space Members",
-							seriesTitle: "Space vs Members"
+							seriesName:"Space Members"
 						}
 	var seriesVisitors = {
-							seriesName:"Space Visitors",
-							seriesTitle: "Space vs Visitors"
+							seriesName:"Space Visitors"
 						 }
 	var diffSpacesMembers={},spaceMembersCount = [],spaceVisitors=[],diffSpacesVisitors={},diffSpaceMembersArray=[], diffSpacesVisitorsArray=[]
 	for(var i=0;i<diffSpaceTypes.length;i++){
@@ -187,10 +185,10 @@ $("div").on("click",".statDiv",function(){
 			    	debugger
 			    	$("body").html(statsContent)
 			    	$(".chartDiv").height($(window).height() - 120)
-			    	loadCharts("diffSpaceVisitors",diffSpacesVisitorsArray,seriesVisitors)
-			    	loadCharts("diffSpaceMembers",diffSpaceMembersArray,seriesMembers)
-			    	loadCharts("spaceVisitors",spaceVisitors,seriesVisitors)
-			    	loadCharts("spaceMembers",spaceMembersCount,seriesMembers)
+			    	loadCharts("diffSpaceVisitors",diffSpacesVisitorsArray,seriesVisitors,"#visitors across spaces")
+			    	loadCharts("diffSpaceMembers",diffSpaceMembersArray,seriesMembers,"#members across spaces")
+			    	loadCharts("spaceVisitors",spaceVisitors,seriesVisitors,"#visitors per space")
+			    	loadCharts("spaceMembers",spaceMembersCount,seriesMembers,"#members per space")
 			    	bindEvents()
 			    },
 			    dataType: 'html'
@@ -445,6 +443,7 @@ $("div").on("click","#addNewMemberToSpace",function(e){
  $("div").on("click",".deleteDrpDwnIcon",function(e){
  	e.stopPropagation();
  	$(this).closest('.newMembersDiv_drpDwn').remove()
+ 	$(this).closest('.spcMembers_drpDwn').remove()
  })
 
 /*Delete existing member from space*/
