@@ -146,7 +146,20 @@ $("div").on("click",".statDiv",function(){
 	var seriesVisitors = {
 							seriesName:"Space Visitors"
 						 }
-	var diffSpacesMembers={},spaceMembersCount = [],spaceVisitors=[],diffSpacesVisitors={},diffSpaceMembersArray=[], diffSpacesVisitorsArray=[]
+	var diffSpacesMembers={},
+		spaceMembersCount = [],
+		spaceVisitors=[],
+		diffSpacesVisitors={},
+		diffSpaceMembersArray=[], 
+		diffSpacesVisitorsArray=[],
+		maxVisitorsStat={
+			maxVisitors:0,
+			maxVisitsSpaceId:null
+		}
+		maxMembersStat={
+			maxMembers:0,
+			maxMembersSpaceId:null
+		}
 	for(var i=0;i<diffSpaceTypes.length;i++){
 		diffSpacesMembers[diffSpaceTypes[i]] = 0
 		diffSpacesVisitors[diffSpaceTypes[i]] = 0
@@ -156,9 +169,12 @@ $("div").on("click",".statDiv",function(){
 		debugger
 		for(var i=0;i<allSpaceData.length;i++){
 			var totalSpaceMembers = ((allSpaceData[i].members == null)? 0: allSpaceData[i].members.length)
-			//spaceMembersCount[allSpaceData[i].id]= totalSpaceMembers
+			
+			if(allSpaceData[i].visitors > maxVisitorsStat.maxVisitors){
+				maxVisitorsStat.maxVisitors = allSpaceData[i].visitors
+				maxVisitorsStat.maxVisitsSpaceId = allSpaceData[i].id
+			}
 			spaceMembersCount.push({name: "Space ID: "+allSpaceData[i].id,y:totalSpaceMembers})
-			//spaceVisitors[allSpaceData[i].id]= allSpaceData[i].visitors
 			spaceVisitors.push({name:"Space ID: "+allSpaceData[i].id,y:allSpaceData[i].visitors})
 			if(allSpaceData[i].welcome){
 			 diffSpacesMembers["welcome"] += totalSpaceMembers
@@ -185,6 +201,10 @@ $("div").on("click",".statDiv",function(){
 			    	debugger
 			    	$("body").html(statsContent)
 			    	$(".chartDiv").height($(window).height() - 120)
+			    	if(maxVisitorsStat.maxVisitors >0){
+				    	$(".trendingDiv").html("<sup>**</sup>Trending Space "+maxVisitorsStat.maxVisitsSpaceId+" with "+maxVisitorsStat.maxVisitors +" visitors")
+				    	
+				    }
 			    	loadCharts("diffSpaceVisitors",diffSpacesVisitorsArray,seriesVisitors,"#visitors across spaces")
 			    	loadCharts("diffSpaceMembers",diffSpaceMembersArray,seriesMembers,"#members across spaces")
 			    	loadCharts("spaceVisitors",spaceVisitors,seriesVisitors,"#visitors per space")
@@ -197,19 +217,7 @@ $("div").on("click",".statDiv",function(){
 	})
 })
 
-/*$(".gotoAdmin").on("click",function(e){
-	debugger
-	e.stopPropagation();
-	$.ajax({
-		    url: "html/loadingScreen.html",
-		    success: function (spaceScreen) { 
-		    	$("body").html(spaceScreen)
-		    	loadSpaces()
-		    	bindEvents()
-		    },
-		    dataType: 'html'
-		});
-})*/
+
 
 $("div").on("click",".delMultiSpacesText",function(e){
 	debugger

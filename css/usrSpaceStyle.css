@@ -124,6 +124,11 @@
 	float:left;
     padding-left: 20px;
 }
+.trendingDiv {
+    float: right;
+    padding-right: 20px;
+    color: #447ac1;
+}
 .addSpaceDiv{
 	float:right;
 	padding: 40px;
