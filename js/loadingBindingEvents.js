@@ -73,6 +73,28 @@ var populateData = function(id){
 /*Action Events*/
 var bindEvents = function(){
 
+$("div").on("click",".searchIcon",function(e){
+	debugger
+	e.stopPropagation();
+	var searchInput = $(".searchBar").val()
+	Data.Space.getAll().then(function(spaceData){
+		 debugger   	
+		for(var i=0;i<spaceData.length;i++){
+			if(spaceData[i].title.toLowerCase().indexOf(searchInput.toLowerCase()) != -1 || spaceData[i].description.toLowerCase().indexOf(searchInput.toLowerCase()) != -1){
+				//spaceObj[spaceData[i].id] = spaceData[i];
+				$('.userSpaceContainerLeft').empty();
+		    	$('.userSpaceContainerRight').empty();
+				(function(i){
+					populateData(i)
+						   
+				}).call(spaceData[i],spaceData[i].id)
+			}
+		}
+	})
+
+})
+
+
 /*Delete Space*/
 $("div").on( "click", ".deleteSpace", function(e) {
   e.stopPropagation();
