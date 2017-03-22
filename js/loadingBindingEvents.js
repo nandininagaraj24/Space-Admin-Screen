@@ -1,4 +1,4 @@
-var userInfoObj ={},spaceObj={},userNameToIdMap={},spacesToDel=[]
+var userInfoObj ={},spaceObj={},userNameToIdMap={},spacesToDel=[],visits={}
 
 /*Fetch Existing Users information */
 Data.User.getAll().then(function(userData){
@@ -19,6 +19,7 @@ Data.Space.getAll().then(function(spaceData){
 
 		    	for(var i=0;i<spaceData.length;i++){
 				    	spaceObj[spaceData[i].id] = spaceData[i];
+				    	visits[spaceData[i].id] = spaceData[i].visitors;
 				    	(function(i){
 					
 						    populateData(i)
@@ -30,6 +31,7 @@ Data.Space.getAll().then(function(spaceData){
 		    dataType: 'html'
 		});
 });
+
 
 /*loading spaces*/
 var loadSpaces = function(){
@@ -112,10 +114,88 @@ $("div").on("click",".multiDelCheckbox",function(e){
 
 })
 
+$("div").on("click",".statDiv",function(){
+	debugger
+	console.log(visits)
+	var diffSpaceTypes= ["welcome","private","featured"]
+	var seriesMembers = {
+							seriesName:"Space Members",
+							seriesTitle: "Space vs Members"
+						}
+	var seriesVisitors = {
+							seriesName:"Space Visitors",
+							seriesTitle: "Space vs Visitors"
+						 }
+	var diffSpacesMembers={},spaceMembersCount = [],spaceVisitors=[],diffSpacesVisitors={},diffSpaceMembersArray=[], diffSpacesVisitorsArray=[]
+	for(var i=0;i<diffSpaceTypes.length;i++){
+		diffSpacesMembers[diffSpaceTypes[i]] = 0
+		diffSpacesVisitors[diffSpaceTypes[i]] = 0
+	}
+	
+	Data.Space.getAll().then(function(allSpaceData){
+		debugger
+		for(var i=0;i<allSpaceData.length;i++){
+			var totalSpaceMembers = ((allSpaceData[i].members == null)? 0: allSpaceData[i].members.length)
+			//spaceMembersCount[allSpaceData[i].id]= totalSpaceMembers
+			spaceMembersCount.push({name: "Space ID: "+allSpaceData[i].id,y:totalSpaceMembers})
+			//spaceVisitors[allSpaceData[i].id]= allSpaceData[i].visitors
+			spaceVisitors.push({name:"Space ID: "+allSpaceData[i].id,y:allSpaceData[i].visitors})
+			if(allSpaceData[i].welcome){
+			 diffSpacesMembers["welcome"] += totalSpaceMembers
+			 diffSpacesVisitors["welcome"] += allSpaceData[i].visitors
+			}
+			else if(allSpaceData[i].private){
+			 diffSpacesMembers["private"] += totalSpaceMembers
+			 diffSpacesVisitors["private"] += allSpaceData[i].visitors
+			}
+			else if(allSpaceData[i].featured){
+			 diffSpacesMembers["featured"] += totalSpaceMembers
+			 diffSpacesVisitors["featured"]+= allSpaceData[i].visitors
+			}
+
+				
+		}
+		for(var i=0;i<diffSpaceTypes.length;i++){
+			diffSpaceMembersArray.push({name:diffSpaceTypes[i],y:diffSpacesMembers[diffSpaceTypes[i]]})
+			diffSpacesVisitorsArray.push({name:diffSpaceTypes[i],y:diffSpacesVisitors[diffSpaceTypes[i]]})
+		}
+		$.ajax({
+			    url: "html/stats.html",
+			    success: function (statsContent) { 
+			    	debugger
+			    	$("body").html(statsContent)
+			    	$(".chartDiv").height($(window).height() - 120)
+			    	loadCharts("diffSpaceVisitors",diffSpacesVisitorsArray,seriesVisitors)
+			    	loadCharts("diffSpaceMembers",diffSpaceMembersArray,seriesMembers)
+			    	loadCharts("spaceVisitors",spaceVisitors,seriesVisitors)
+			    	loadCharts("spaceMembers",spaceMembersCount,seriesMembers)
+			    	bindEvents()
+			    },
+			    dataType: 'html'
+			});
+
+	})
+})
+
+/*$(".gotoAdmin").on("click",function(e){
+	debugger
+	e.stopPropagation();
+	$.ajax({
+		    url: "html/loadingScreen.html",
+		    success: function (spaceScreen) { 
+		    	$("body").html(spaceScreen)
+		    	loadSpaces()
+		    	bindEvents()
+		    },
+		    dataType: 'html'
+		});
+})*/
+
 $("div").on("click",".delMultiSpacesText",function(e){
 	debugger
 	e.stopPropagation();
 	for(var i=0;i<spacesToDel.length;i++){
+		visits[spacesToDel[i]]++;
 		(function(i){
 		Data.Space.deleteById(spacesToDel[i]).then(function (res){
 			debugger
@@ -134,32 +214,39 @@ $("div").on("click",".delMultiSpacesText",function(e){
 $("div").on( "click", ".editSpace", function(e) {
 	e.stopPropagation();
 	var spaceDivId = parseInt($(this).closest(".userSpace").find(".spaceTitle").attr("data-spaceid"))
+	
 	Data.Space.getById(spaceDivId).then(function(spaceDetails){
+		debugger
+		var editSpaceDetails = spaceDetails
+		editSpaceDetails.visitors = ++visits[spaceDivId];
 		var membersArray = spaceDetails.members
-		$.ajax({
-		    url: "html/spaceInfo.html",
-		    success: function (spaceInfoContent) { 
-		    	var $currentSpaceInfo = $(spaceInfoContent)
-		    	if(spaceObj[spaceDivId].welcome)  $($currentSpaceInfo).find("#welcome").prop('checked', true);
-		    	if(spaceObj[spaceDivId].private)  $($currentSpaceInfo).find("#private").prop('checked', true);
-		    	if(spaceObj[spaceDivId].featured) $($currentSpaceInfo).find("#featured").prop('checked', true);
-		    	$($currentSpaceInfo).find(".spcTitle").attr("data-spaceId",spaceObj[spaceDivId].id)
-		    	$($currentSpaceInfo).find(".spcTitle").val(spaceObj[spaceDivId].title)
-		    	$($currentSpaceInfo).find("#spcDescr").val(spaceObj[spaceDivId].description)
+		Data.Space.updateById(spaceDivId,editSpaceDetails).then(function(spaceVisitorsEdited){
+			debugger
+			$.ajax({
+			    url: "html/spaceInfo.html",
+			    success: function (spaceInfoContent) { 
+			    	var $currentSpaceInfo = $(spaceInfoContent)
+			    	if(spaceObj[spaceDivId].welcome)  $($currentSpaceInfo).find("#welcome").prop('checked', true);
+			    	if(spaceObj[spaceDivId].private)  $($currentSpaceInfo).find("#private").prop('checked', true);
+			    	if(spaceObj[spaceDivId].featured) $($currentSpaceInfo).find("#featured").prop('checked', true);
+			    	$($currentSpaceInfo).find(".spcTitle").attr("data-spaceId",spaceObj[spaceDivId].id)
+			    	$($currentSpaceInfo).find(".spcTitle").val(spaceObj[spaceDivId].title)
+			    	$($currentSpaceInfo).find("#spcDescr").val(spaceObj[spaceDivId].description)
 
-		    	if(membersArray){
-		    		for(var i=0;i<membersArray.length;i++){
-				    	$($currentSpaceInfo).find("#spcMembers").append('<div class="existingMemberDiv"><div class="existingMember"><i class="fa fa-user-o userIcon" aria-hidden="true"></i><span>'+userInfoObj[membersArray[i]].first_name+" "+userInfoObj[membersArray[i]].last_name+'</span></div><span class="deleteUsr"><i class="fa fa-minus-circle deleteUsrIcon" title="Remove Member" aria-hidden="true"></i></span></div>')
-				    }
-		    	}
-		    	else{
-		    		$($currentSpaceInfo).find("#spcMembers").append('<div>None</div>')
-		    	}
+			    	if(membersArray){
+			    		for(var i=0;i<membersArray.length;i++){
+					    	$($currentSpaceInfo).find("#spcMembers").append('<div class="existingMemberDiv"><div class="existingMember"><i class="fa fa-user-o userIcon" aria-hidden="true"></i><span>'+userInfoObj[membersArray[i]].first_name+" "+userInfoObj[membersArray[i]].last_name+'</span></div><span class="deleteUsr"><i class="fa fa-minus-circle deleteUsrIcon" title="Remove Member" aria-hidden="true"></i></span></div>')
+					    }
+			    	}
+			    	else{
+			    		$($currentSpaceInfo).find("#spcMembers").append('<div>None</div>')
+			    	}
 
-		    	$(".userSpaceContainer").html($currentSpaceInfo)
-		    },
-		    dataType: 'html'
-		});
+			    	$(".userSpaceContainer").html($currentSpaceInfo)
+			    },
+			    dataType: 'html'
+			});
+		})
 	})
 })
 
@@ -215,7 +302,8 @@ $("div").on( "click", ".saveNewSpace", function(e) {
 	    "created_by":parseInt($('.createdByUser_drpDwn').val()),
 	    "welcome":true,
 	    "private":false,
-	    "featured":false
+	    "featured":false,
+	    "visitors":0
 	  }
 	  if(!spaceParams.title || !spaceParams.description || !spaceParams.created_by){
 	  	alert("Title, description and created by are mandatory fields");
@@ -251,6 +339,7 @@ $("div").on( "click", ".saveNewSpace", function(e) {
 $("div").on( "click", ".saveEditedSpace", function(e) {
 	e.stopPropagation();
   	var spaceId = parseInt($(".spcTitle").attr("data-spaceid"))
+  	
 	Data.Space.getById(spaceId).then(function(spaceDetails){
 		var memberId = (spaceDetails.members)?spaceDetails.members:[]
 		var $membersDrpDwn = $(".newMembersDiv_drpDwn").find("select")
@@ -268,7 +357,8 @@ $("div").on( "click", ".saveEditedSpace", function(e) {
 		    "created_by":parseInt($('.createdByUser_drpDwn').val()),
 		    "welcome":$('#welcome').prop('checked'),
 		    "private":$('#private').prop('checked'),
-		    "featured":$('#featured').prop('checked')
+		    "featured":$('#featured').prop('checked'),
+		    "visitors":visits[spaceId]
 		}
 		if(!spaceParams.title || !spaceParams.description || !spaceParams.created_by){
 		  	alert("Title, description and created by are mandatory fields");

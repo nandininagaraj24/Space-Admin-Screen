@@ -31,7 +31,8 @@
 			"private": false,
 			"featured": false,
 			"created_by": 1,
-			"members": null
+			"members": null,
+			"visitors":4
 		},
 		"2": {
 			"id": 2,
@@ -41,7 +42,8 @@
 			"private": false,
 			"featured": true,
 			"created_by": 1,
-			"members": null
+			"members": null,
+			"visitors":2
 		},
 		"3": {
 			"id": 3,
@@ -51,7 +53,8 @@
 			"private": true,
 			"featured": false,
 			"created_by": 1,
-			"members": [1, 2]
+			"members": [1, 2],
+			"visitors":0
 		}
 	}
 }
