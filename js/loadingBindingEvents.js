@@ -222,6 +222,9 @@ $("div").on("click",".statDiv",function(){
 $("div").on("click",".delMultiSpacesText",function(e){
 	debugger
 	e.stopPropagation();
+	$(this).removeClass("delMultiSpacesText").addClass("delMultipleSpaces")
+	$(".delMultipleSpaces").text("Select Multipe Spaces")
+	$(".multiDelCheckbox").remove()
 	for(var i=0;i<spacesToDel.length;i++){
 		visits[spacesToDel[i]]++;
 		(function(i){
@@ -334,7 +337,7 @@ $("div").on( "click", ".saveNewSpace", function(e) {
 	    "visitors":0
 	  }
 	  if(!spaceParams.title || !spaceParams.description || !spaceParams.created_by){
-	  	alert("Title, description and created by are mandatory fields");
+	  	alert("Title and description are mandatory fields");
 	  }
 	  else{
 		  Data.Space.create(spaceParams).then(function(createdSpace){
