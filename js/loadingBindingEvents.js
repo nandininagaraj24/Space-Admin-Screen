@@ -35,8 +35,7 @@ Data.Space.getAll().then(function(spaceData){
 
 /*loading spaces*/
 var loadSpaces = function(){
-	Data.Space.getAll().then(function(spaceData){
-		 debugger   	
+	Data.Space.getAll().then(function(spaceData){  	
 		for(var i=0;i<spaceData.length;i++){
 			spaceObj[spaceData[i].id] = spaceData[i];
 				(function(i){
@@ -52,7 +51,6 @@ var populateData = function(id){
     	$.ajax({
 		    url: "html/usrSpace.html",
 		    success: function (usrSpace) { 
-		    	debugger
 		    	var usrSpaceDiv = $(usrSpace)
 		    	$(usrSpaceDiv).find(".spaceTitle").attr("data-spaceid",spaceObj[id].id);
 		    	$(usrSpaceDiv).find(".spaceTitle").html(spaceObj[id].title +" created by "+userInfoObj[spaceObj[id].created_by].first_name+" "+userInfoObj[spaceObj[id].created_by].last_name)
@@ -74,11 +72,9 @@ var populateData = function(id){
 var bindEvents = function(){
 
 $("div").on("click",".searchIcon",function(e){
-	debugger
 	e.stopPropagation();
 	var searchInput = $(".searchBar").val()
-	Data.Space.getAll().then(function(spaceData){
-		 debugger   	
+	Data.Space.getAll().then(function(spaceData){  	
 		for(var i=0;i<spaceData.length;i++){
 			if(spaceData[i].title.toLowerCase().indexOf(searchInput.toLowerCase()) != -1 || spaceData[i].description.toLowerCase().indexOf(searchInput.toLowerCase()) != -1){
 				//spaceObj[spaceData[i].id] = spaceData[i];
@@ -116,8 +112,8 @@ $("div").on( "click", ".deleteSpace", function(e) {
 	})
 })
 
+/*Adding checkboxes for multi select of spaces*/
 $("div").on("click",".delMultipleSpaces",function(e){
-	debugger
 	e.stopPropagation();
 	spacesToDel=[]
 	$(this).removeClass('delMultipleSpaces').addClass('delMultiSpacesText')
@@ -126,8 +122,8 @@ $("div").on("click",".delMultipleSpaces",function(e){
 	$('.delMultiSpacesText').text("Click to delete")
 })
 
+/*Selecting spaces to delete*/
 $("div").on("click",".multiDelCheckbox",function(e){
-	debugger
 	e.stopPropagation();
 	var spaceId =  $(this).siblings(".spaceTitle").attr("data-spaceid")
 	if(!isNaN(spaceId)){
@@ -136,9 +132,8 @@ $("div").on("click",".multiDelCheckbox",function(e){
 
 })
 
+/*Loading statistics charts*/
 $("div").on("click",".statDiv",function(){
-	debugger
-	console.log(visits)
 	var diffSpaceTypes= ["welcome","private","featured"]
 	var seriesMembers = {
 							seriesName:"Space Members"
@@ -166,7 +161,6 @@ $("div").on("click",".statDiv",function(){
 	}
 	
 	Data.Space.getAll().then(function(allSpaceData){
-		debugger
 		for(var i=0;i<allSpaceData.length;i++){
 			var totalSpaceMembers = ((allSpaceData[i].members == null)? 0: allSpaceData[i].members.length)
 			
@@ -198,7 +192,6 @@ $("div").on("click",".statDiv",function(){
 		$.ajax({
 			    url: "html/stats.html",
 			    success: function (statsContent) { 
-			    	debugger
 			    	$("body").html(statsContent)
 			    	$(".chartDiv").height($(window).height() - 120)
 			    	if(maxVisitorsStat.maxVisitors >0){
@@ -218,9 +211,8 @@ $("div").on("click",".statDiv",function(){
 })
 
 
-
+/*Deleting multiple spaces*/
 $("div").on("click",".delMultiSpacesText",function(e){
-	debugger
 	e.stopPropagation();
 	$(this).removeClass("delMultiSpacesText").addClass("delMultipleSpaces")
 	$(".delMultipleSpaces").text("Select Multipe Spaces")
@@ -229,7 +221,6 @@ $("div").on("click",".delMultiSpacesText",function(e){
 		visits[spacesToDel[i]]++;
 		(function(i){
 		Data.Space.deleteById(spacesToDel[i]).then(function (res){
-			debugger
 			if(i == spacesToDel.length-1){
 				$('.userSpaceContainerLeft').empty()
 		    	$('.userSpaceContainerRight').empty()
@@ -247,12 +238,10 @@ $("div").on( "click", ".editSpace", function(e) {
 	var spaceDivId = parseInt($(this).closest(".userSpace").find(".spaceTitle").attr("data-spaceid"))
 	
 	Data.Space.getById(spaceDivId).then(function(spaceDetails){
-		debugger
 		var editSpaceDetails = spaceDetails
 		editSpaceDetails.visitors = ++visits[spaceDivId];
 		var membersArray = spaceDetails.members
 		Data.Space.updateById(spaceDivId,editSpaceDetails).then(function(spaceVisitorsEdited){
-			debugger
 			$.ajax({
 			    url: "html/spaceInfo.html",
 			    success: function (spaceInfoContent) { 

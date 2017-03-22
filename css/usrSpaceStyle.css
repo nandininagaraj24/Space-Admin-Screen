@@ -98,6 +98,7 @@
 .searchIcon{
     float: right;
     color: grey;
+    cursor: pointer;
 }
 .userSpaceContainer{
 	width: 100%;
