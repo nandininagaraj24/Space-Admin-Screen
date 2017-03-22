@@ -3,7 +3,13 @@ var loadCharts = function(selector,chartData,seriesData){
     var chart = {
        plotBackgroundColor: null,
        plotBorderWidth: null,
-       plotShadow: false
+       plotShadow: false,
+       type: 'pie',
+        options3d: {
+            enabled: true,
+            alpha: 45,
+            beta: 0
+        }
    };
    var title = {
       text: seriesData.seriesTitle,
@@ -24,7 +30,8 @@ var loadCharts = function(selector,chartData,seriesData){
             enabled: false           
          },
          showInLegend: true,
-         size: '70%'
+         size: '70%',
+         depth: 35
       }
    };
    var credits = {enabled:false}
